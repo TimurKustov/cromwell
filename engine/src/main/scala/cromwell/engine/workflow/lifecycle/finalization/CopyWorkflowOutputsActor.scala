@@ -68,9 +68,8 @@ class CopyWorkflowOutputsActor(workflowId: WorkflowId, override val ioActor: Act
           s" as multiple files will be copied to the same path: \n${formattedCollidingCopyOptions.mkString("\n")}")}
 
     val copies = outputFilePaths map {
-      case (srcPath, dstPath) => 
-        dstPath.createDirectories()
-        asyncIo.copyAsync(srcPath, dstPath)
+      // There is no need for explicit creating of directories, because copy command will do it automatically
+      case (srcPath, dstPath) => asyncIo.copyAsync(srcPath, dstPath)
     }
     
     Future.sequence(copies)

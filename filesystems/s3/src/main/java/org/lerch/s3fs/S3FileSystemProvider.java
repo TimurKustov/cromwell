@@ -1,8 +1,29 @@
 package org.lerch.s3fs;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.AWSCredentialsProviderChain;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.event.ProgressEvent;
+import com.amazonaws.event.ProgressListener;
+import com.amazonaws.services.s3.AmazonS3;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.transfer.Copy;
+import com.amazonaws.services.s3.transfer.PersistableTransfer;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.amazonaws.services.s3.transfer.internal.S3ProgressListener;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProviderChain;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.model.Bucket;
 import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
@@ -71,7 +92,8 @@ import static java.lang.String.format;
  * </p>
  */
 public class S3FileSystemProvider extends FileSystemProvider {
-
+    private final AwsCredentials credentials;
+    private final Region region;
     public static final String CHARSET_KEY = "s3fs_charset";
     public static final String AMAZON_S3_FACTORY_CLASS = "s3fs_amazon_s3_factory";
 
@@ -82,6 +104,12 @@ public class S3FileSystemProvider extends FileSystemProvider {
 
     private S3Utils s3Utils = new S3Utils();
     private Cache cache = new Cache();
+
+    public S3FileSystemProvider(AwsCredentials credentials, Region storageRegion) {
+        super();
+        this.credentials = credentials;
+        this.region = storageRegion;
+    }
 
     @Override
     public String getScheme() {
@@ -423,8 +451,8 @@ public class S3FileSystemProvider extends FileSystemProvider {
         S3Path s3Target = toS3Path(target);
         // TODO: implements support for copying directories
 
-        Preconditions.checkArgument(!Files.isDirectory(source), "copying directories is not yet supported: %s", source);
-        Preconditions.checkArgument(!Files.isDirectory(target), "copying directories is not yet supported: %s", target);
+//        Preconditions.checkArgument(!Files.isDirectory(source), "copying directories is not yet supported: %s", source);
+//        Preconditions.checkArgument(!Files.isDirectory(target), "copying directories is not yet supported: %s", target);
 
         ImmutableSet<CopyOption> actualOptions = ImmutableSet.copyOf(options);
         verifySupportedOptions(EnumSet.of(StandardCopyOption.REPLACE_EXISTING), actualOptions);
@@ -437,13 +465,31 @@ public class S3FileSystemProvider extends FileSystemProvider {
         String keySource = s3Source.getKey();
         String bucketNameTarget = s3Target.getFileStore().name();
         String keyTarget = s3Target.getKey();
-        s3Source.getFileSystem()
-                .getClient()
-                .copyObject(CopyObjectRequest.builder()
-                                             .copySource(bucketNameOrigin + "/" + keySource)
-                                             .bucket(bucketNameTarget)
-                                             .key(keyTarget)
-                                             .build());
+
+        final BasicAWSCredentials creds = new BasicAWSCredentials(credentials.accessKeyId(), credentials.secretAccessKey());
+        final AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(creds))
+                .withRegion(region.id())
+                .build();
+
+        final TransferManager manager = TransferManagerBuilder.standard().withS3Client(s3Client).build();
+        final Copy copy = manager.copy(new com.amazonaws.services.s3.model.CopyObjectRequest(
+                bucketNameOrigin,
+                keySource,
+                bucketNameTarget,
+                keyTarget
+        ));
+
+        copy.addProgressListener((ProgressListener) progressEvent ->
+                System.out.println("Transferred bytes: " + progressEvent.getBytesTransferred()));
+
+        try {
+            copy.waitForCompletion();
+        } catch (InterruptedException e) {
+            System.out.println("Copying was interrupted");
+            e.printStackTrace();
+        }
+        manager.shutdownNow();
     }
 
     @Override

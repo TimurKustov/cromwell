@@ -130,12 +130,14 @@ object S3PathBuilder {
                       configuration: S3Configuration,
                       options: WorkflowOptions,
                       storageRegion: Option[Region]): S3PathBuilder = {
-    new S3PathBuilder(S3Storage.s3Client(credentials, storageRegion), configuration)
+    new S3PathBuilder(S3Storage.s3Client(credentials, storageRegion), configuration, credentials, storageRegion)
   }
 }
 
 class S3PathBuilder(client: S3Client,
-                     configuration: S3Configuration
+                    configuration: S3Configuration,
+                    credentials: AwsCredentials,
+                    storageRegion: Option[Region]
                      ) extends PathBuilder {
   // Tries to create a new S3Path from a String representing an absolute s3 path: s3://<bucket>[/<key>].
   def build(string: String): Try[S3Path] = {
@@ -144,7 +146,7 @@ class S3PathBuilder(client: S3Client,
         Try {
           // TODO: System.getenv needs to turn into a full Auth thingy
           // TODO: This assumes the "global endpoint". Need to handle other endpoints
-          val s3Path = new S3FileSystemProvider()
+          val s3Path = new S3FileSystemProvider(credentials, storageRegion.getOrElse(Region.US_EAST_2))
             .getFileSystem(URI.create("s3:////"), System.getenv, client)
             .getPath(s"""/$bucket/$path""")
           S3Path(s3Path, bucket, client)
