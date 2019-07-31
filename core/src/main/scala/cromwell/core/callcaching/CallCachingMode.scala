@@ -35,4 +35,10 @@ case object ReadCache extends ReadWriteMode { override val w = false }
 case object WriteCache extends ReadWriteMode { override val r = false }
 case object ReadAndWriteCache extends ReadWriteMode
 
-final case class CallCachingOptions(invalidateBadCacheResults: Boolean = true, workflowOptionCallCachePrefixes: Option[Vector[String]] = None)
+final case class CallCachingOptions
+(
+  invalidateBadCacheResults: Boolean = true,
+  workflowOptionCallCachePrefixes: Option[Vector[String]] = None,
+  logCacheHitFailures: Boolean = false,
+  addCacheHitFailuresToMetadata: Boolean = false,
+)

@@ -82,6 +82,7 @@ class EngineJobExecutionActor(replyTo: ActorRef,
   val jobTag = s"${workflowIdForLogging.shortString}:${jobDescriptorKey.call.fullyQualifiedName}:${jobDescriptorKey.index.fromIndex}:${jobDescriptorKey.attempt}"
   val tag = s"EJEA_$jobTag"
 
+  //noinspection ActorMutableStateInspection
   // There's no need to check for a cache hit again if we got preempted, or if there's no result copying actor defined
   // NB: this can also change (e.g. if we have a HashError we just force this to CallCachingOff)
   private[execution] var effectiveCallCachingMode = {
@@ -101,9 +102,16 @@ class EngineJobExecutionActor(replyTo: ActorRef,
   private val callCachingHitFailures = CallCachingKeys.HitFailuresKey
   private val callCachingHashes = CallCachingKeys.HashesKey
 
-  val callCachePathPrefixes = for {
-    activity <- Option(effectiveCallCachingMode) collect { case a: CallCachingActivity => a }
-    workflowOptionPrefixes <- activity.options.workflowOptionCallCachePrefixes
+  private val callCachingOptionsOption = effectiveCallCachingMode match {
+    case callCachingActivity: CallCachingActivity => Option(callCachingActivity.options)
+    case _ => None
+  }
+
+  private val invalidationRequired = callCachingOptionsOption.exists(_.invalidateBadCacheResults)
+
+  private val callCachePathPrefixes = for {
+    callCachingOptions <- callCachingOptionsOption
+    workflowOptionPrefixes <- callCachingOptions.workflowOptionCallCachePrefixes
     d <- initializationData collect { case d: StandardInitializationData => d }
     rootPrefix = d.workflowPaths.callCacheRootPrefix
   } yield CallCachePathPrefixes(rootPrefix, workflowOptionPrefixes.toList)
@@ -115,6 +123,7 @@ class EngineJobExecutionActor(replyTo: ActorRef,
   }
 
   startWith(Pending, NoData)
+  //noinspection ActorMutableStateInspection
   private var eventList: Seq[ExecutionEvent] = Seq(ExecutionEvent(stateName.toString))
 
   override def onTimedTransition(from: EngineJobExecutionActorState, to: EngineJobExecutionActorState, duration: FiniteDuration) = {
@@ -483,16 +492,15 @@ class EngineJobExecutionActor(replyTo: ActorRef,
 
   private def forwardAndStop(response: BackendJobExecutionResponse): State = {
     replyTo forward response
-    returnExecutionToken()
-    instrumentJobComplete(response)
-    pushExecutionEventsToMetadataService(jobDescriptorKey, eventList)
-    recordExecutionStepTiming(stateName.toString, currentStateDuration)
-    context stop self
-    stay()
+    stop(response)
   }
 
   private def respondAndStop(response: BackendJobExecutionResponse): State = {
     replyTo ! response
+    stop(response)
+  }
+
+  private def stop(response: BackendJobExecutionResponse): State = {
     returnExecutionToken()
     instrumentJobComplete(response)
     pushExecutionEventsToMetadataService(jobDescriptorKey, eventList)
@@ -648,6 +656,30 @@ class EngineJobExecutionActor(replyTo: ActorRef,
   }
 
   private def publishHitFailure(cache: EJEACacheHit, failure: Throwable) = {
+    callCachingOptionsOption foreach { callCachingOptions =>
+      if (callCachingOptions.logCacheHitFailures || invalidationRequired) {
+        logHitFailure(cache, failure)
+      }
+      if (callCachingOptions.addCacheHitFailuresToMetadata) {
+        putMetadataHitFailure(cache, failure)
+      }
+    }
+  }
+
+  private def logHitFailure(cache: EJEACacheHit, reason: Throwable): Unit = {
+    val problemSummary = s"${reason.getClass.getSimpleName}: ${reason.getMessage}"
+    if (invalidationRequired) {
+      log.warning(
+        "Failed copying cache results for job {} ({}), invalidating cache entry.",
+        jobDescriptorKey,
+        problemSummary,
+      )
+    } else {
+      log.info("Failed copying cache results for job {} ({})", jobDescriptorKey, problemSummary)
+    }
+  }
+
+  private def putMetadataHitFailure(cache: EJEACacheHit, failure: Throwable): Unit = {
     import WomValueSimpleton._
     import cromwell.services.metadata.MetadataService._
 
@@ -665,13 +697,7 @@ class EngineJobExecutionActor(replyTo: ActorRef,
   private def invalidateCacheHitAndTransition(ejeaCacheHit: EJEACacheHit, data: ResponsePendingData, reason: Throwable) = {
     publishHitFailure(ejeaCacheHit, reason)
 
-    val invalidationRequired = effectiveCallCachingMode match {
-      case CallCachingOff => throw new RuntimeException("Should not be calling invalidateCacheHit if call caching is off!") // Very unexpected. Fail out of this bad-state EJEA.
-      case activity: CallCachingActivity => activity.options.invalidateBadCacheResults
-    }
     if (invalidationRequired) {
-      val problemSummary = s"${reason.getClass.getSimpleName}: ${reason.getMessage}"
-      log.warning("Failed copying cache results for job {} ({}), invalidating cache entry.", jobDescriptorKey, problemSummary)
       invalidateCacheHit(ejeaCacheHit.hit.cacheResultId)
       goto(InvalidatingCacheEntry)
     } else {

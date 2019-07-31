@@ -4,12 +4,18 @@ Cromwell's call cache is maintained in its database.  In order for call caching 
 
 **Configuring Call Caching**
 
-*Call Caching is disabled by default.*  Call Caching can be enabled in your Cromwell [Configuration](Configuring#call-caching) and the behavior can be modified via [Workflow Options](wf_options/Overview). If you are adding Workflow options, do not set [`read_from_cache` or `write_to_cache`](wf_options/Overview#call-caching-options) = false, as it will impact the following process.
+*Call Caching is disabled by default.*  Call Caching can be enabled in your Cromwell
+[Configuration](../Configuring#call-caching) and the behavior can be modified via
+[Workflow Options](../wf_options/Overview). If you are adding Workflow options, do not set
+[`read_from_cache` or `write_to_cache`](../wf_options/Overview#call-caching-options) = false, as it will impact the
+following process.
 
 Once enabled, Cromwell by default will search the call cache for every `call` statement invocation.
 
 * If there was no cache hit, the `call` will be executed as normal.  Once finished it will add itself to the cache.
-* If there was a cache hit, outputs are either **copied from the original cached job to the new job's output directory** or **referenced from the original cached job** depending on the Cromwell [Configuration](Configuring#call-caching) settings.
+* If there was a cache hit, outputs are either **copied from the original cached job to the new job's output directory**
+or **referenced from the original cached job** depending on the Cromwell
+[Configuration](../Configuring#call-caching) settings.
 
 > **Note:** If call caching is enabled, be careful not to change the contents of the output directory for any previously run job.  Doing so might cause cache hits in Cromwell to copy over modified data and Cromwell currently does not check that the contents of the output directory changed.  Additionally, if any files from a previous job directory are removed, call caching will fail due to missing files.
 
@@ -81,6 +87,38 @@ Cromwell would search cache hits in all of the `gs://alice_bucket`, `gs://bob_bu
 
 If no `call_cache_hit_path_prefixes` are specified then all matching cache hits will be considered.
 
+***Call cache failure logging***
+
+By default when call caching fails to copy previous results the failure reason will be logged. Cromwell will continue to
+search for other call caching candidates, and when no candidates are left Cromwell will run the job on the backend.
+
+The logging of these informational messages can be adjusted via the configuration value:
+
+```hocon
+call-caching {
+  log-cache-hit-failures: true
+}
+```
+
+Set the above configuration value to `false` to disable the logging of call cache failure messages.
+
+***Call cache failure metadata***
+
+Similar to call cache failure logging, the informational messages may optionally be stored within the workflow metadata,
+where they will later be returned via the `/metadata` endpoint. By default the messages are not stored in the metadata,
+and are logged instead.
+
+```hocon
+call-caching {
+  add-cache-hit-failures-to-metadata: false
+}
+```
+
+Set the above configuration value to `true` to send call cache failure messages to the workflow metadata.
+
+Logging and storing failure messages in metadata are independent configurations, and may be separately enabled or
+disabled.
+
 **Docker Tags**
 
 Certain Docker tags can impact call caching performance. 
@@ -123,20 +161,28 @@ Cromwell provides two methods to lookup a Docker hash from a Docker tag:
     
     Docker registry and access levels supported by Cromwell for docker digest lookup in "remote" mode:
     
-    |       |       DockerHub    ||       GCR       ||       ECR       ||    AlibabaCloudCR    ||
-    |:-----:|:---------:|:-------:|:------:|:-------:|:------:|:-------:|:------:|:-------:|
-    |       |   Public  | Private | Public | Private | Public | Private | Public | Private |
-    | Pipelines API  |     X     |    X    |    X   |    X    |         |         |         |         |
-    | AWS Batch |    X    |        |   X      |         |         |         |         |         |
-    | BCS       |         |        |         |         |         |         |         |    X    |
-    | Other |     X     |         |    X   |         |         |         |         |         |
-    
+    <!-- Pasted into then regenerated at https://www.tablesgenerator.com/markdown_tables -->
+
+    |               | DockerHub | DockerHub |   GCR  |   GCR   |   ECR  |   ECR   |   ACR  |   ACR   |
+    |:-------------:|:---------:|:---------:|:------:|:-------:|:------:|:-------:|:------:|:-------:|
+    |               |   Public  |  Private  | Public | Private | Public | Private | Public | Private |
+    | Pipelines API |     X     |     X     |    X   |    X    |        |         |        |         |
+    |   AWS Batch   |     X     |           |    X   |         |        |         |        |         |
+    |      BCS      |           |           |        |         |        |         |        |    X    |
+    |     Other     |     X     |           |    X   |         |        |         |        |         |
+
+    <!-- Pasted then regenerated at https://www.tablesgenerator.com/markdown_tables -->
+
 **Runtime Attributes**
 
-As well as call inputs and the command to run, call caching considers the following [runtime attributes](https://cromwell.readthedocs.io/en/develop/RuntimeAttributes/) of a given task when determining whether to call cache:
+As well as call inputs and the command to run, call caching considers the following [runtime
+attributes](../RuntimeAttributes) of a given task when determining whether to call cache:
 
-* [`ContinueOnReturnCode`](https://cromwell.readthedocs.io/en/develop/RuntimeAttributes/#continueonreturncode)
-* [`Docker`](https://cromwell.readthedocs.io/en/develop/RuntimeAttributes/#docker)
-* [`FailOnStderr`](https://cromwell.readthedocs.io/en/develop/RuntimeAttributes/#failonstderr)
+* [`ContinueOnReturnCode`](../RuntimeAttributes/#continueonreturncode)
+* [`Docker`](../RuntimeAttributes/#docker)
+* [`FailOnStderr`](../RuntimeAttributes/#failonstderr)
 
-If any of these attributes have changed from a previous instance of the same task, that instance will not be call-cached from. Other runtime attributes, including [`memory`](https://cromwell.readthedocs.io/en/develop/RuntimeAttributes/#memory), [`cpu`](https://cromwell.readthedocs.io/en/develop/RuntimeAttributes/#cpu), and [`disks`](https://cromwell.readthedocs.io/en/develop/RuntimeAttributes/#disks), are not considered by call caching and therefore may be changed without preventing a cached result from being used. 
+If any of these attributes have changed from a previous instance of the same task, that instance will not be call-cached
+from. Other runtime attributes, including [`memory`](../RuntimeAttributes/#memory), [`cpu`](../RuntimeAttributes/#cpu),
+and [`disks`](../RuntimeAttributes/#disks), are not considered by call caching and therefore may be changed without
+preventing a cached result from being used.
