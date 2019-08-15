@@ -128,25 +128,17 @@ object MaterializeWorkflowDescriptorActor {
 
       val errorOrMaybePrefixes = workflowOptions.getVectorOfStrings("call_cache_hit_path_prefixes")
       val errorOrInvalidateBadCacheResults = errorOrCallCachingBoolean("invalidate-bad-cache-results")
-      val errorOrLogCacheHitFailures = errorOrCallCachingBoolean("log-cache-hit-failures")
-      val errorOrAddCacheHitFailuresToMetadata = errorOrCallCachingBoolean("add-cache-hit-failures-to-metadata")
       val errorOrCallCachingOptions = (
         errorOrMaybePrefixes,
         errorOrInvalidateBadCacheResults,
-        errorOrLogCacheHitFailures,
-        errorOrAddCacheHitFailuresToMetadata,
       ) mapN {
         (
           maybePrefixes,
           invalidateBadCacheResults,
-          logCacheHitFailures,
-          addCacheHitFailuresToMetadata,
         ) =>
           CallCachingOptions(
             invalidateBadCacheResults,
             maybePrefixes,
-            logCacheHitFailures,
-            addCacheHitFailuresToMetadata,
           )
       }
       for {

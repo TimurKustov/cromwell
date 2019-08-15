@@ -101,16 +101,6 @@ class CachingConfigSpec extends FlatSpec with Matchers with TableDrivenPropertyC
         NonEmptyList.of("String: 2: invalidate-bad-cache-results has type STRING rather than BOOLEAN"),
       ),
       (
-        "log-cache-hit-failures:not-a-boolean",
-        WorkflowOptions.empty,
-        NonEmptyList.of("String: 2: log-cache-hit-failures has type STRING rather than BOOLEAN"),
-      ),
-      (
-        "add-cache-hit-failures-to-metadata:not-a-boolean",
-        WorkflowOptions.empty,
-        NonEmptyList.of("String: 2: add-cache-hit-failures-to-metadata has type STRING rather than BOOLEAN"),
-      ),
-      (
         "",
         WorkflowOptions.fromMap(Map(
           "call_cache_hit_path_prefixes" -> "not-an-array"

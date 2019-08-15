@@ -89,35 +89,9 @@ If no `call_cache_hit_path_prefixes` are specified then all matching cache hits 
 
 ***Call cache failure logging***
 
-By default when call caching fails to copy previous results the failure reason will be logged. Cromwell will continue to
-search for other call caching candidates, and when no candidates are left Cromwell will run the job on the backend.
-
-The logging of these informational messages can be adjusted via the configuration value:
-
-```hocon
-call-caching {
-  log-cache-hit-failures: true
-}
-```
-
-Set the above configuration value to `false` to disable the logging of call cache failure messages.
-
-***Call cache failure metadata***
-
-Similar to call cache failure logging, the informational messages may optionally be stored within the workflow metadata,
-where they will later be returned via the `/metadata` endpoint. By default the messages are not stored in the metadata,
-and are logged instead.
-
-```hocon
-call-caching {
-  add-cache-hit-failures-to-metadata: false
-}
-```
-
-Set the above configuration value to `true` to send call cache failure messages to the workflow metadata.
-
-Logging and storing failure messages in metadata are independent configurations, and may be separately enabled or
-disabled.
+When searching for previous results to cache, the first three times (per call) that caching is unable to copy results
+those failure reason will be logged. Cromwell will continue to attempt to copy previous results for the call, and when
+no candidates are left Cromwell will run the job on the backend.
 
 **Docker Tags**
 

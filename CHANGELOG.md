@@ -14,11 +14,12 @@ Globs can be used to define outputs for BCS backend.
 #### NAS mount
 Alibaba Cloud NAS is now supported for the `mounts` runtime attribute.
 
-### Call Caching Failure Messages
+### Call Caching Failure Messages [(#5095)](https://github.com/broadinstitute/cromwell/pull/5095)
 
-By default, call cache failure messages are now sent to the logs instead of the workflow metadata. Failure message
-delivery to the logs and/or metadata may be adjusted via new configuration keys. See [the Cromwell call caching
-documentation](https://cromwell.readthedocs.io/en/stable/cromwell_features/CallCaching/) for more information.
+Call cache failures are no longer sent to the workflow metadata. Instead a limited number of call cache failure messages
+will be sent to the workflow log. See [the Cromwell call caching
+documentation](https://cromwell.readthedocs.io/en/stable/cromwell_features/CallCaching/) for more information on call
+cache failure logging.
 
 ## 44 Release Notes
 
