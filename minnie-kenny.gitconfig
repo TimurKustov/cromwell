@@ -1,0 +1,9 @@
+[secrets]
+    patterns = private_key
+    patterns = private_key_id
+    allowed = \"private_key_id\": \"OMITTED\"
+    allowed = \"private_key\": \"-----BEGIN PRIVATE KEY-----\\\\nBASE64 ENCODED KEY WITH \\\\n TO REPRESENT NEWLINES\\\\n-----END PRIVATE KEY-----\\\\n\"
+    allowed = \"client_id\": \"22377410244549202395\"
+    allowed = `private_key` portion needs
+    allowed = .Data.private_key
+    allowed = .Data.service_account.private_key
