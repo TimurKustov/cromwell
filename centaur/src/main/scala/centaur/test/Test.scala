@@ -12,6 +12,8 @@ import centaur.test.metadata.WorkflowFlatMetadata
 import centaur.test.metadata.WorkflowFlatMetadata._
 import centaur.test.submit.SubmitHttpResponse
 import centaur.test.workflow.Workflow
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.api.services.genomics.{Genomics, GenomicsScopes}
 import com.google.api.services.storage.StorageScopes
 import com.google.auth.Credentials
@@ -23,6 +25,7 @@ import common.validation.Validation._
 import configs.syntax._
 import cromwell.api.CromwellClient.UnsuccessfulRequestException
 import cromwell.api.model.{CallCacheDiff, Failed, SubmittedWorkflow, Succeeded, TerminalStatus, WorkflowId, WorkflowMetadata, WorkflowStatus}
+import cromwell.cloudsupport.aws.AwsConfiguration
 import cromwell.cloudsupport.gcp.GoogleConfiguration
 import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import io.circe.parser._
@@ -110,6 +113,17 @@ object Operations {
       .setApplicationName(configuration.applicationName)
       .setRootUrl(genomicsEndpointUrl)
       .build()
+  }
+
+  lazy val awsConfiguration: AwsConfiguration = AwsConfiguration(CentaurConfig.conf)
+  lazy val awsConf: Config = CentaurConfig.conf.getConfig("aws")
+  lazy val awsAuthName: String = awsConf.getString("auths")
+  lazy val region: String  = awsConf.getString("region")
+  lazy val accessKeyId: String  = awsConf.getString("access-key")
+  lazy val secretAccessKey: String = awsConf.getString("secret-key")
+  def buildAmazonS3Client: AmazonS3 = {
+    val basicAWSCredentials = new BasicAWSCredentials(accessKeyId, secretAccessKey)
+    AmazonS3ClientBuilder.standard.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).withRegion(region).build
   }
 
   lazy val storage: Storage = {
@@ -498,7 +512,7 @@ object Operations {
     override def run: IO[Unit] = workflowDefinition.directoryContentCounts match {
       case None => IO.unit
       case Some(directoryContentCountCheck) =>
-        val counts = directoryContentCountCheck.expectedDrectoryContentsCounts map {
+        val counts = directoryContentCountCheck.expectedDirectoryContentsCounts map {
           case (directory, count) =>
             val substitutedDir = directory.replaceAll("<<UUID>>", workflowId)
             (substitutedDir, count, directoryContentCountCheck.checkFiles.countObjectsAtPath(substitutedDir))
