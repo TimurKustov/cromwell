@@ -12,6 +12,7 @@ import centaur.test.metadata.WorkflowFlatMetadata
 import centaur.test.metadata.WorkflowFlatMetadata._
 import centaur.test.submit.SubmitHttpResponse
 import centaur.test.workflow.Workflow
+import com.amazonaws.services.s3.model.{ListObjectsRequest, ObjectListing}
 import com.google.api.services.genomics.{Genomics, GenomicsScopes}
 import com.google.api.services.storage.StorageScopes
 import com.google.auth.Credentials
@@ -27,6 +28,7 @@ import cromwell.cloudsupport.gcp.GoogleConfiguration
 import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import io.circe.parser._
 import spray.json.JsString
+import com.amazonaws.services.s3.model.{S3ObjectSummary, ObjectListing, GetObjectRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -110,6 +112,11 @@ object Operations {
       .setApplicationName(configuration.applicationName)
       .setRootUrl(genomicsEndpointUrl)
       .build()
+  }
+
+  lazy val awsS3storageRequest : ListObjectsRequest = {
+     val listObjectsRequest : ListObjectsRequest = new ListObjectsRequest
+    listObjectsRequest.withBucketName("bucket").withPrefix("").withMarker("")
   }
 
   lazy val storage: Storage = {
@@ -498,7 +505,7 @@ object Operations {
     override def run: IO[Unit] = workflowDefinition.directoryContentCounts match {
       case None => IO.unit
       case Some(directoryContentCountCheck) =>
-        val counts = directoryContentCountCheck.expectedDrectoryContentsCounts map {
+        val counts = directoryContentCountCheck.expectedDirectoryContentsCounts map {
           case (directory, count) =>
             val substitutedDir = directory.replaceAll("<<UUID>>", workflowId)
             (substitutedDir, count, directoryContentCountCheck.checkFiles.countObjectsAtPath(substitutedDir))
