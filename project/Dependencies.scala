@@ -12,6 +12,7 @@ object Dependencies {
   private val apacheCommonNetV = "3.6"
   private val apacheHttpClientV = "4.5.7"
   private val awsSdkV = "2.3.9"
+  private val amazonAwsV = "1.11.500"
   private val betterFilesV = "2.17.1"
   private val catsEffectV = "1.2.0"
   private val catsV = "1.5.0"
@@ -262,6 +263,7 @@ object Dependencies {
 
   private val awsCloudDependencies = List(
     "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonV,
+    "com.amazonaws" % "aws-java-sdk-s3" % amazonAwsV
   ) ++ s3fsDependencies ++ List(
     "batch",
     "core",
@@ -449,7 +451,7 @@ object Dependencies {
     "com.chuusai" %% "shapeless" % shapelessV,
     "com.storm-enroute" %% "scalameter" % scalameterV % Test,
     "com.github.scopt" %% "scopt" % scoptV,
-    "org.scalamock" %% "scalamock" % scalamockV % Test,
+    "org.scalamock" %% "scalamock" % scalamockV % Test
   ) ++ akkaStreamDependencies ++ configDependencies ++ catsDependencies ++ circeDependencies ++
     googleApiClientDependencies ++ statsDDependencies ++ betterFilesDependencies ++
     // TODO: We're not using the "F" in slf4j. Core only supports logback, specifically the WorkflowLogger.
@@ -468,7 +470,8 @@ object Dependencies {
   val centaurDependencies = List(
     "org.apache.commons" % "commons-math3" % commonsMathV,
     "com.github.kxbmap" %% "configs" % configsV,
-    "com.google.cloud" % "google-cloud-bigquery" % googleCloudCoreV % IntegrationTest
+    "com.google.cloud" % "google-cloud-bigquery" % googleCloudCoreV % IntegrationTest,
+    "org.scalamock" %% "scalamock" % scalamockV % Test
   ) ++ circeDependencies ++ slf4jBindingDependencies ++ cloudSupportDependencies ++ http4sDependencies
 
   val engineDependencies = List(
