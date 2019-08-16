@@ -4,6 +4,8 @@ import java.time.OffsetDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import cats.data.NonEmptyList
+import common.validation.IOChecked._
+import common.validation.Validation._
 import cromwell.core.Dispatcher._
 import cromwell.core._
 import cromwell.engine.instrumentation.WorkflowInstrumentation
@@ -41,7 +43,7 @@ final case class WorkflowStoreSubmitActor(store: WorkflowStore, serviceRegistryA
           val wfTypeVersion = cmd.source.workflowTypeVersion.getOrElse("Unspecified version")
           log.info("{} ({}) workflow {} submitted", wfType, wfTypeVersion, workflowSubmissionResponse.id)
           val labelsMap = convertJsonToLabelsMap(cmd.source.labelsJson)
-          publishLabelsToMetadata(workflowSubmissionResponse.id, labelsMap, serviceRegistryActor)
+          publishLabelsToMetadata(workflowSubmissionResponse.id, labelsMap, serviceRegistryActor).toErrorOr.toTry.get
           sndr ! WorkflowSubmittedToStore(
             workflowSubmissionResponse.id,
             convertDatabaseStateToApiState(workflowSubmissionResponse.state)
