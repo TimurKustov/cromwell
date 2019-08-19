@@ -1,4 +1,5 @@
-package centaur
+package centaur.s3filechecking
+
 import java.util
 
 import centaur.test.AwsS3Ops
