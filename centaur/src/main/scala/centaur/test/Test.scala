@@ -114,11 +114,6 @@ object Operations {
       .build()
   }
 
-  lazy val awsS3storageRequest : ListObjectsRequest = {
-     val listObjectsRequest : ListObjectsRequest = new ListObjectsRequest
-    listObjectsRequest.withBucketName("bucket").withPrefix("").withMarker("")
-  }
-
   lazy val storage: Storage = {
     val builder = StorageOptions.newBuilder().setCredentials(credentials)
     projectOption foreach builder.setProjectId
