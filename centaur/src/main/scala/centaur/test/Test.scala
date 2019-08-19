@@ -115,22 +115,23 @@ object Operations {
       .build()
   }
 
+  lazy val storage: Storage = {
+    val builder = StorageOptions.newBuilder().setCredentials(credentials)
+    projectOption foreach builder.setProjectId
+    val storageOptions = builder.build()
+    storageOptions.getService
+  }
+
   lazy val awsConfiguration: AwsConfiguration = AwsConfiguration(CentaurConfig.conf)
   lazy val awsConf: Config = CentaurConfig.conf.getConfig("aws")
   lazy val awsAuthName: String = awsConf.getString("auths")
   lazy val region: String  = awsConf.getString("region")
   lazy val accessKeyId: String  = awsConf.getString("access-key")
   lazy val secretAccessKey: String = awsConf.getString("secret-key")
+
   def buildAmazonS3Client: AmazonS3 = {
     val basicAWSCredentials = new BasicAWSCredentials(accessKeyId, secretAccessKey)
     AmazonS3ClientBuilder.standard.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).withRegion(region).build
-  }
-
-  lazy val storage: Storage = {
-    val builder = StorageOptions.newBuilder().setCredentials(credentials)
-    projectOption foreach builder.setProjectId
-    val storageOptions = builder.build()
-    storageOptions.getService
   }
 
   def submitWorkflow(workflow: Workflow): Test[SubmittedWorkflow] = {
