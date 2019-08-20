@@ -1,11 +1,9 @@
 package centaur.test
 
-import com.amazonaws.services.s3.model.{ObjectListing, S3ObjectSummary}
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.cloud.storage.Storage.BlobListOption
 import com.google.cloud.storage.{Blob, Storage}
 
-import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
@@ -60,22 +58,13 @@ object AwsS3Ops {
     AwsS3Path(bucket, directory)
   }
 
+  private def isFileExists(s3: AmazonS3, bucket: String, prefix: String): Boolean =
+    s3.listObjects(bucket, prefix).getObjectSummaries.asScala.nonEmpty
 
-  private def scan[T](s3: AmazonS3, bucket: String, prefix: String, f: S3ObjectSummary => T) = {
-    @tailrec
-    def scanInner(acc: List[T], listing: ObjectListing): List[T] = {
-      val summaries = collectionAsScalaIterable[S3ObjectSummary](listing.getObjectSummaries)
-      val mapped = (for (summary <- summaries) yield f(summary)).toList
-
-      if (!listing.isTruncated) mapped
-      else scanInner(acc ::: mapped, s3.listNextBatchOfObjects(listing))
-    }
-
-    scanInner(List(), s3.listObjects(bucket, prefix))
-  }
+  implicit def boolToInt(b: Boolean) = if (b) 1 else 0
 
   def countObjectsAtPath: AwsS3Path => Int = {
-    AwsS3Path => scan(AmazonS3ClientBuilder.standard().build(), AwsS3Path.bucket, AwsS3Path.directory, s => s.getSize).sum.toInt
+    AwsS3Path => isFileExists(AmazonS3ClientBuilder.standard().build(), AwsS3Path.bucket, AwsS3Path.directory).toInt
   }
 
 }
