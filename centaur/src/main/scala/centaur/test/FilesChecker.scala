@@ -1,11 +1,9 @@
 package centaur.test
 
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.model.{ListObjectsRequest, ObjectListing, S3ObjectSummary}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.cloud.storage.Storage.BlobListOption
 import com.google.cloud.storage.{Blob, Storage}
 
-import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
@@ -37,14 +35,8 @@ case object LocalFilesChecker extends FilesChecker {
 
 case object AWSFilesChecker extends FilesChecker {
 
-  import AwsS3._
-
-  private lazy val s3storageRequest = Operations.awsS3storageRequest
-
   override def countObjectsAtPath: String => Int =
-    s3storageRequest.parsePath andThen s3storageRequest.countObjectsAtPath
-
-
+    AwsS3Ops.parsePath andThen AwsS3Ops.countObjectsAtPath
 }
 
 case class GCSPath(bucket: String, directory: String)
@@ -56,13 +48,7 @@ object GCS {
   implicit def gcsOps(s: Storage): GCSOps = GCSOps(s)
 }
 
-object AwsS3 {
-
-  implicit def awsS3Ops(s: ListObjectsRequest): AwsS3Ops = AwsS3Ops(s)
-
-}
-
-case class AwsS3Ops(request: ListObjectsRequest) {
+object AwsS3Ops {
 
   def parsePath: String => AwsS3Path = { fullPath =>
     val bucketAndDashes = fullPath.drop(5).split('/')
@@ -72,21 +58,13 @@ case class AwsS3Ops(request: ListObjectsRequest) {
     AwsS3Path(bucket, directory)
   }
 
-  private def scan[T](s3: AmazonS3, bucket: String, prefix: String, f: S3ObjectSummary => T) = {
-    @tailrec
-    def scanInner(acc: List[T], listing: ObjectListing): List[T] = {
-      val summaries = collectionAsScalaIterable[S3ObjectSummary](listing.getObjectSummaries)
-      val mapped = (for (summary <- summaries) yield f(summary)).toList
+  private def isFileExists(s3: AmazonS3, bucket: String, prefix: String): Boolean =
+    s3.listObjects(bucket, prefix).getObjectSummaries.asScala.nonEmpty
 
-      if (!listing.isTruncated) mapped
-      else scanInner(acc ::: mapped, s3.listNextBatchOfObjects(listing))
-    }
-
-    scanInner(List(), s3.listObjects(bucket, prefix))
-  }
+  implicit def boolToInt(b: Boolean) = if (b) 1 else 0
 
   def countObjectsAtPath: AwsS3Path => Int = {
-    AwsS3Path => scan(Operations.buildAmazonS3Client, AwsS3Path.bucket, AwsS3Path.directory, s => s.getSize).sum.toInt
+    AwsS3Path => isFileExists(AmazonS3ClientBuilder.standard().build(), AwsS3Path.bucket, AwsS3Path.directory).toInt
   }
 
 }

@@ -15,6 +15,8 @@ import centaur.test.workflow.Workflow
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.services.s3.model.ListObjectsRequest
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.api.services.genomics.{Genomics, GenomicsScopes}
 import com.google.api.services.storage.StorageScopes
 import com.google.auth.Credentials
@@ -31,6 +33,7 @@ import cromwell.cloudsupport.gcp.GoogleConfiguration
 import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import io.circe.parser._
 import spray.json.JsString
+import com.amazonaws.services.s3.model.{S3ObjectSummary, ObjectListing, GetObjectRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -114,11 +117,6 @@ object Operations {
       .setApplicationName(configuration.applicationName)
       .setRootUrl(genomicsEndpointUrl)
       .build()
-  }
-
-  lazy val awsS3storageRequest : ListObjectsRequest = {
-     val listObjectsRequest : ListObjectsRequest = new ListObjectsRequest
-    listObjectsRequest.withBucketName("bucket").withPrefix("").withMarker("")
   }
 
   lazy val storage: Storage = {
