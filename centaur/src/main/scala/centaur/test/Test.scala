@@ -131,7 +131,10 @@ object Operations {
 
   def buildAmazonS3Client: AmazonS3 = {
     val basicAWSCredentials = new BasicAWSCredentials(accessKeyId, secretAccessKey)
-    AmazonS3ClientBuilder.standard.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).withRegion(region).build
+    AmazonS3ClientBuilder.standard
+      .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
+      .withRegion(region)
+      .build()
   }
 
   def submitWorkflow(workflow: Workflow): Test[SubmittedWorkflow] = {
