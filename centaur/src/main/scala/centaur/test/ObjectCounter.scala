@@ -1,8 +1,10 @@
 package centaur.test
 
-import com.amazonaws.services.s3.AmazonS3
-import com.google.cloud.storage.{Blob, Storage}
 import com.google.cloud.storage.Storage.BlobListOption
+import com.google.cloud.storage.{Blob, Storage}
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.ListObjectsRequest
+
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
@@ -12,7 +14,7 @@ trait ObjectCounter[A] {
       val prefixLength = 5
       val bucketAndDashes = fullPath.drop(prefixLength).split("/", 2)
       val bucket = bucketAndDashes.head
-      val directory = bucketAndDashes.tail.mkString("/")
+      val directory = bucketAndDashes.tail.mkString
       Path(bucket, directory)
     } else throw IllegalPathException()
   }
@@ -22,11 +24,11 @@ trait ObjectCounter[A] {
 
 object ObjectCounterInstances {
 
-  implicit val awsS3ObjectCounter: ObjectCounter[AmazonS3] = (amazonS3: AmazonS3) => {
+  implicit val awsS3ObjectCounter: ObjectCounter[S3Client] = (amazonS3: S3Client) => {
     implicit def boolToInt(b: Boolean) = if (b) 1 else 0
 
-    def isFileExists(s3: AmazonS3, bucket: String, prefix: String): Boolean =
-      s3.listObjects(bucket, prefix).getObjectSummaries.asScala.nonEmpty
+    def isFileExists(s3: S3Client, bucket: String, prefix: String): Boolean =
+      !s3.listObjects(ListObjectsRequest.builder().bucket(bucket).prefix(prefix).build()).contents().isEmpty
 
     AwsS3Path => isFileExists(amazonS3, AwsS3Path.bucket, AwsS3Path.directory).toInt
   }

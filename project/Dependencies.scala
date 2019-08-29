@@ -260,8 +260,7 @@ object Dependencies {
   ) ++ slf4jBindingDependencies
 
   private val awsCloudDependencies = List(
-    "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonV,
-    "com.amazonaws" % "aws-java-sdk-s3" % amazonAwsV
+    "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonV
   ) ++ s3fsDependencies ++ List(
     "batch",
     "core",
