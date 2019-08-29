@@ -12,8 +12,6 @@ import centaur.test.metadata.WorkflowFlatMetadata
 import centaur.test.metadata.WorkflowFlatMetadata._
 import centaur.test.submit.SubmitHttpResponse
 import centaur.test.workflow.Workflow
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.api.services.genomics.{Genomics, GenomicsScopes}
 import com.google.api.services.storage.StorageScopes
 import com.google.auth.Credentials
@@ -29,6 +27,9 @@ import cromwell.cloudsupport.aws.AwsConfiguration
 import cromwell.cloudsupport.gcp.GoogleConfiguration
 import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import io.circe.parser._
+import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
 import spray.json.JsString
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -129,9 +130,13 @@ object Operations {
   lazy val accessKeyId: String  = awsConf.getString("access-key")
   lazy val secretAccessKey: String = awsConf.getString("secret-key")
 
-  def buildAmazonS3Client: AmazonS3 = {
-    val basicAWSCredentials = new BasicAWSCredentials(accessKeyId, secretAccessKey)
-    AmazonS3ClientBuilder.standard.withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).withRegion(region).build
+
+  def buildAmazonS3Client: S3Client = {
+    val basicAWSCredentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+    S3Client.builder()
+      .region(Region.of(region))
+      .credentialsProvider(StaticCredentialsProvider.create(basicAWSCredentials))
+      .build()
   }
 
   def submitWorkflow(workflow: Workflow): Test[SubmittedWorkflow] = {
