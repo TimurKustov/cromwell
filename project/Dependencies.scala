@@ -12,6 +12,7 @@ object Dependencies {
   private val apacheCommonNetV = "3.6"
   private val apacheHttpClientV = "4.5.7"
   private val awsSdkV = "2.3.9"
+  private val amazonAwsV = "1.11.500"
   private val betterFilesV = "2.17.1"
   private val catsEffectV = "1.2.0"
   private val catsV = "1.5.0"
@@ -262,13 +263,13 @@ object Dependencies {
   ) ++ slf4jBindingDependencies
 
   private val awsCloudDependencies = List(
-    "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonV,
+    "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonV
   ) ++ s3fsDependencies ++ List(
     "batch",
     "core",
     "cloudwatchlogs",
     "s3",
-    "sts",
+    "sts"
   ).map(artifactName => "software.amazon.awssdk" % artifactName % awsSdkV)
 
   private val googleCloudDependencies = List(
@@ -303,7 +304,7 @@ object Dependencies {
     "com.sun.xml.bind" % "jaxb-impl" % jaxbV,
     "org.glassfish.jaxb" % "jaxb-runtime" % jaxbV
       // already included in com.sun.activation
-      exclude("jakarta.activation", "jakarta.activation-api"),
+      exclude("jakarta.activation", "jakarta.activation-api")
   )
 
   private val aliyunBatchComputeDependencies = List(
@@ -320,7 +321,7 @@ object Dependencies {
     "com.sun.xml.bind" % "jaxb-impl" % jaxbV,
     "org.glassfish.jaxb" % "jaxb-runtime" % jaxbV
       // already included in com.sun.activation
-      exclude("jakarta.activation", "jakarta.activation-api"),
+      exclude("jakarta.activation", "jakarta.activation-api")
   )
 
   private val aliyunCrDependencies = List(
@@ -348,13 +349,13 @@ object Dependencies {
   val commonDependencies = List(
     "org.typelevel" %% "cats-effect" % catsEffectV,
     "org.apache.commons" % "commons-lang3" % commonsLang3V,
-    "org.apache.commons" % "commons-text" % commonsTextV,
+    "org.apache.commons" % "commons-text" % commonsTextV
   ) ++ catsDependencies ++ configDependencies ++ slf4jFacadeDependencies
 
   val cloudSupportDependencies = googleApiClientDependencies ++ googleCloudDependencies ++ betterFilesDependencies ++ awsCloudDependencies
 
   val databaseSqlDependencies = List(
-    "commons-io" % "commons-io" % commonsIoV,
+    "commons-io" % "commons-io" % commonsIoV
   ) ++ configDependencies ++ catsDependencies ++ slickDependencies ++ dbmsDependencies ++ refinedTypeDependenciesList
 
   val statsDDependencies = List(
@@ -385,7 +386,7 @@ object Dependencies {
     "io.spray" %% "spray-json" % sprayJsonV,
     "org.scalacheck" %% "scalacheck" % scalacheckV % Test,
     "com.github.mpilquist" %% "simulacrum" % simulacrumV,
-    "commons-codec" % "commons-codec" % commonsCodecV,
+    "commons-codec" % "commons-codec" % commonsCodecV
   ) ++ circeDependencies ++ refinedTypeDependenciesList
 
   val wdlDependencies = List(
@@ -450,7 +451,7 @@ object Dependencies {
     "com.chuusai" %% "shapeless" % shapelessV,
     "com.storm-enroute" %% "scalameter" % scalameterV % Test,
     "com.github.scopt" %% "scopt" % scoptV,
-    "org.scalamock" %% "scalamock" % scalamockV % Test,
+    "org.scalamock" %% "scalamock" % scalamockV % Test
   ) ++ akkaStreamDependencies ++ configDependencies ++ catsDependencies ++ circeDependencies ++
     googleApiClientDependencies ++ statsDDependencies ++ betterFilesDependencies ++
     // TODO: We're not using the "F" in slf4j. Core only supports logback, specifically the WorkflowLogger.
@@ -583,7 +584,7 @@ object Dependencies {
     https://mvnrepository.com/artifact/com.google.api-client/google-api-client/1.28.0
      */
     "com.google.http-client" % "google-http-client-apache" % googleHttpClientApacheV,
-    "com.google.http-client" % "google-http-client" % googleHttpClientV,
+    "com.google.http-client" % "google-http-client" % googleHttpClientV
   )
 
   val nettyDependencyOverrides = List(
@@ -599,7 +600,7 @@ object Dependencies {
     "resolver-dns",
     "transport",
     "transport-native-epoll",
-    "transport-native-unix-common",
+    "transport-native-unix-common"
   ).map(m => "io.netty" % s"netty-$m" % nettyV)
 
   val rdf4jDependencyOverrides = List(
@@ -627,7 +628,7 @@ object Dependencies {
     "rio-trig",
     "rio-trix",
     "rio-turtle",
-    "util",
+    "util"
   ).map(m => "org.eclipse.rdf4j" % s"rdf4j-$m" % rdf4jV)
 
   // Some libraries are importing older version of these dependencies, causing conflicts. Hence the need to override them.
@@ -640,7 +641,7 @@ object Dependencies {
     "netty-shaded",
     "protobuf-lite",
     "protobuf",
-    "stub",
+    "stub"
   ).map(m => "io.grpc" % s"grpc-$m" % grpcV)
 
   /*
