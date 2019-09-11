@@ -114,6 +114,11 @@ abstract class CromwellRootActor(terminator: CromwellTerminator,
     .props(CopyWorkflowLogsActor.props(serviceRegistryActor, ioActor)),
     "WorkflowLogCopyRouter")
 
+  //Call-caching config validation
+  lazy val callCachingConfig = config.getConfig("call-caching")
+  val callCachingEnabled = callCachingConfig.getBoolean("enabled")
+  val callInvalidateBadCacheResults = callCachingConfig.getBoolean("invalidate-bad-cache-results")
+
   lazy val callCache: CallCache = new CallCache(EngineServicesStore.engineDatabaseInterface)
 
   lazy val numberOfCacheReadWorkers = config.getConfig("system").as[Option[Int]]("number-of-cache-read-workers").getOrElse(DefaultNumberOfCacheReadWorkers)
@@ -151,6 +156,8 @@ abstract class CromwellRootActor(terminator: CromwellTerminator,
   lazy val workflowManagerActor = context.actorOf(
     WorkflowManagerActor.props(
       config = config,
+      errorOrCallCachingEnabled = callCachingEnabled,
+      errorOrInvalidateBadCacheResults = callInvalidateBadCacheResults,
       workflowStore = workflowStoreActor,
       ioActor = ioActorProxy,
       serviceRegistryActor = serviceRegistryActor,
@@ -247,4 +254,8 @@ object CromwellRootActor extends GracefulStopSupport {
   val DefaultNumberOfWorkflowLogCopyWorkers = 10
   val DefaultCacheTTL = 20 minutes
   val DefaultNumberOfCacheReadWorkers = 25
+
+  def callCachingBoolean(path: String, callCachingConfig: Config): Boolean = {
+   callCachingConfig.getBoolean(path)
+  }
 }

@@ -49,6 +49,8 @@ object WorkflowManagerActor {
   case class AbortWorkflowsCommand(ids: Set[WorkflowId]) extends WorkflowManagerActorCommand
 
   def props(config: Config,
+            errorOrCallCachingEnabled: Boolean,
+            errorOrInvalidateBadCacheResults: Boolean,
             workflowStore: ActorRef,
             ioActor: ActorRef,
             serviceRegistryActor: ActorRef,
@@ -64,6 +66,8 @@ object WorkflowManagerActor {
             workflowHeartbeatConfig: WorkflowHeartbeatConfig): Props = {
     val params = WorkflowManagerActorParams(
       config = config,
+      errorOrCallCachingEnabled = errorOrCallCachingEnabled,
+      errorOrInvalidateBadCacheResults = errorOrInvalidateBadCacheResults,
       workflowStore = workflowStore,
       ioActor = ioActor,
       serviceRegistryActor = serviceRegistryActor,
@@ -110,6 +114,8 @@ object WorkflowManagerActor {
 }
 
 case class WorkflowManagerActorParams(config: Config,
+                                      errorOrCallCachingEnabled: Boolean,
+                                      errorOrInvalidateBadCacheResults: Boolean,
                                       workflowStore: ActorRef,
                                       ioActor: ActorRef,
                                       serviceRegistryActor: ActorRef,
@@ -128,6 +134,8 @@ class WorkflowManagerActor(params: WorkflowManagerActorParams)
   extends LoggingFSM[WorkflowManagerState, WorkflowManagerData] with WorkflowMetadataHelper with Timers {
 
   private val config = params.config
+  private val errorOrCallCachingEnabled = params.errorOrCallCachingEnabled
+  private val errorOrInvalidateBadCacheResults = params.errorOrInvalidateBadCacheResults
   override val serviceRegistryActor = params.serviceRegistryActor
 
   private val maxWorkflowsRunning = config.getConfig("system").as[Option[Int]]("max-concurrent-workflows").getOrElse(DefaultMaxWorkflowsToRun)
@@ -137,6 +145,8 @@ class WorkflowManagerActor(params: WorkflowManagerActorParams)
 
   private val logger = Logging(context.system, this)
   private val tag = self.path.name
+
+
 
   override def preStart(): Unit = {
     // Starts the workflow polling cycle
@@ -293,6 +303,8 @@ class WorkflowManagerActor(params: WorkflowManagerActorParams)
       workflowToStart = workflow,
       conf = config,
       ioActor = params.ioActor,
+      errorOrCallCachingEnabled = errorOrCallCachingEnabled ,
+      errorOrInvalidateBadCacheResults = errorOrInvalidateBadCacheResults,
       serviceRegistryActor = params.serviceRegistryActor,
       workflowLogCopyRouter = params.workflowLogCopyRouter,
       jobStoreActor = params.jobStoreActor,

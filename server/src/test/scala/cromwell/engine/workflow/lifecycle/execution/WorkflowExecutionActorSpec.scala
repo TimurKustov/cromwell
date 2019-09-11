@@ -1,3 +1,4 @@
+
 package cromwell.engine.workflow.lifecycle.execution
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -108,3 +109,4 @@ class WorkflowExecutionActorSpec extends CromwellTestKitSpec with FlatSpecLike w
     system.stop(serviceRegistryActor)
   }
 }
+
