@@ -1,5 +1,7 @@
 package cromwell.cloudsupport.gcp.auth
 
+
+import cromwell.cloudsupport.auth.ApplicationDefaultMode
 import org.scalatest.{FlatSpec, Matchers}
 
 class ApplicationDefaultModeSpec extends FlatSpec with Matchers {

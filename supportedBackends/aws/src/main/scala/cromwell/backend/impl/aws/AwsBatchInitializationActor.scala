@@ -75,7 +75,7 @@ class AwsBatchInitializationActor(params: AwsBatchInitializationActorParams)
     AwsBatchRuntimeAttributes.runtimeAttributesBuilder(configuration)
 
   private lazy val credentials: Future[AwsCredentials] =
-    Future { configuration.awsAuth.credential(_ => "") }
+    Future { configuration.awsAuth.credentials(_ => "") }
 
   override lazy val workflowPaths: Future[AwsBatchWorkflowPaths] = for {
     creds <- credentials

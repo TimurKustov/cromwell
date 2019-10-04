@@ -7,8 +7,8 @@ import com.typesafe.config.Config
 import common.exception.AggregatedMessageException
 import common.validation.ErrorOr.ErrorOr
 import common.validation.Validation.validate
+import cromwell.cloudsupport.auth.{ApplicationDefaultMode, GoogleAuthMode, ServiceAccountMode}
 import cromwell.cloudsupport.gcp.GoogleConfiguration
-import cromwell.cloudsupport.gcp.auth._
 import net.ceedubs.ficus.Ficus._
 
 import scala.concurrent.duration._

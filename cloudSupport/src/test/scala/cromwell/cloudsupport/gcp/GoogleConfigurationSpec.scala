@@ -7,9 +7,9 @@ import cats.implicits._
 import com.google.api.client.http.GenericUrl
 import com.google.api.client.testing.http.MockHttpTransport
 import com.typesafe.config.{ConfigException, ConfigFactory}
+import cromwell.cloudsupport.auth.ServiceAccountMode.{JsonFileFormat, PemFileFormat}
+import cromwell.cloudsupport.auth.{ApplicationDefaultMode, RefreshTokenMode, ServiceAccountMode, UserMode, UserServiceAccountMode}
 import cromwell.cloudsupport.gcp.GoogleConfiguration.GoogleConfigurationException
-import cromwell.cloudsupport.gcp.auth.ServiceAccountMode.{JsonFileFormat, PemFileFormat}
-import cromwell.cloudsupport.gcp.auth._
 import org.scalatest.{FlatSpec, Matchers}
 
 

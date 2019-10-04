@@ -36,8 +36,8 @@ import cats.data.{Kleisli, ReaderT}
 import cats.data.Kleisli._
 import cats.data.ReaderT._
 import cats.implicits._
-
 import cromwell.core.ExecutionIndex._
+
 import scala.language.higherKinds
 import cats.effect.{Async, Timer}
 import software.amazon.awssdk.services.batch.BatchClient
@@ -46,7 +46,7 @@ import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient
 import software.amazon.awssdk.services.cloudwatchlogs.model.{GetLogEventsRequest, OutputLogEvent}
 import cromwell.backend.BackendJobDescriptor
 import cromwell.backend.io.JobPaths
-import cromwell.cloudsupport.aws.auth.AwsAuthMode
+import cromwell.cloudsupport.auth.AwsAuthMode
 import org.slf4j.LoggerFactory
 import fs2.Stream
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
@@ -85,7 +85,7 @@ final case class AwsBatchJob(jobDescriptor: BackendJobDescriptor, // WDL/CWL
   lazy val client = {
     val builder = BatchClient.builder()
     optAwsAuthMode.foreach { awsAuthMode =>
-      builder.credentialsProvider(StaticCredentialsProvider.create(awsAuthMode.credential(_ => "")))
+      builder.credentialsProvider(StaticCredentialsProvider.create(awsAuthMode.credentials(_ => "")))
     }
     configRegion.foreach(builder.region)
     builder.build

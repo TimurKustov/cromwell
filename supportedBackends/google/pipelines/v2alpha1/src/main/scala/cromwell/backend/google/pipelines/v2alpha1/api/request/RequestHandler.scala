@@ -10,7 +10,7 @@ import com.google.api.services.genomics.v2alpha1.Genomics
 import cromwell.backend.google.pipelines.common.PipelinesApiConfigurationAttributes
 import cromwell.backend.google.pipelines.common.api.PipelinesApiRequestManager.{PAPIAbortRequest, PAPIRunCreationRequest, PAPIStatusPollRequest}
 import cromwell.backend.google.pipelines.common.api.{PipelinesApiRequestHandler, PipelinesApiRequestManager}
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
+import cromwell.cloudsupport.auth.{AuthMode, GoogleAuthMode}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
@@ -34,7 +34,7 @@ class RequestHandler(applicationName: String, endpointUrl: URL, pipelinesApiAttr
     }
   }
 
-  override def makeBatchRequest = new Genomics.Builder(GoogleAuthMode.httpTransport, GoogleAuthMode.jsonFactory, initializeHttpRequest)
+  override def makeBatchRequest = new Genomics.Builder(GoogleAuthMode.httpTransport, AuthMode.jsonFactory, initializeHttpRequest)
     .setApplicationName(applicationName)
     .setRootUrl(endpointUrl.toString)
     .build()

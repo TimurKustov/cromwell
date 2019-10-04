@@ -4,7 +4,8 @@ import akka.actor.ActorSystem
 import com.google.api.client.http.HttpResponseException
 import com.google.auth.Credentials
 import com.google.cloud.BaseServiceException
-import cromwell.cloudsupport.gcp.auth.{GoogleAuthMode, OptionLookupException}
+import cromwell.cloudsupport.auth.AuthMode.OptionLookupException
+import cromwell.cloudsupport.auth.GoogleAuthMode
 import cromwell.core.retry.Retry
 import cromwell.core.{CromwellFatalExceptionMarker, WorkflowOptions}
 

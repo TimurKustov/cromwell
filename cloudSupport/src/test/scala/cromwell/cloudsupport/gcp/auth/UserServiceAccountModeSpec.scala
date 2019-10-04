@@ -1,5 +1,7 @@
 package cromwell.cloudsupport.gcp.auth
 
+import cromwell.cloudsupport.auth.AuthMode.OptionLookupException
+import cromwell.cloudsupport.auth.{GoogleAuthMode, UserServiceAccountMode} .UserServiceAccountMode
 import org.scalatest.{FlatSpec, Matchers}
 
 class UserServiceAccountModeSpec extends FlatSpec with Matchers {

@@ -6,7 +6,7 @@ import com.google.api.client.googleapis.json.GoogleJsonError
 import com.google.api.client.http.HttpHeaders
 import cromwell.backend.google.pipelines.common.api.PipelinesApiRequestManager._
 import cromwell.backend.google.pipelines.common.api.clients.PipelinesApiAbortClient.{PAPIAbortRequestSuccessful, PAPIOperationAlreadyCancelled, PAPIOperationHasAlreadyFinished}
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
+import cromwell.cloudsupport.auth.AuthMode
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -34,7 +34,7 @@ trait AbortRequestHandler { this: RequestHandler =>
         abortQuery.requester ! PAPIAbortRequestSuccessful(abortQuery.jobId.jobId)
         Success(())
       case response => for {
-        asGoogleError <- Try(GoogleJsonError.parse(GoogleAuthMode.jsonFactory, response))
+        asGoogleError <- Try(GoogleJsonError.parse(AuthMode.jsonFactory, response))
         handled <- handleGoogleError(abortQuery, pollingManager, asGoogleError, response.getHeaders)
       } yield handled
     } recover {

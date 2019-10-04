@@ -12,8 +12,7 @@ import cromwell.backend.google.pipelines.common.PipelinesApiInitializationActor.
 import cromwell.backend.google.pipelines.common.api.PipelinesApiRequestFactory
 import cromwell.backend.standard.{StandardInitializationActor, StandardInitializationActorParams, StandardValidatedRuntimeAttributesBuilder}
 import cromwell.backend.{BackendConfigurationDescriptor, BackendInitializationData, BackendWorkflowDescriptor}
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode.{httpTransport, jsonFactory}
-import cromwell.cloudsupport.gcp.auth.{GoogleAuthMode, UserServiceAccountMode}
+import cromwell.cloudsupport.auth.{AuthMode, GoogleAuthMode, UserServiceAccountMode}
 import cromwell.core.Dispatcher
 import cromwell.core.io.AsyncIoActorClient
 import cromwell.filesystems.gcs.GoogleUtil._
@@ -171,7 +170,7 @@ object PipelinesApiInitializationActor {
 
   def encryptKms(keyName: String, credentials: OAuth2Credentials, plainText: String): String = {
     val httpCredentialsAdapter = new HttpCredentialsAdapter(credentials)
-    val kms = new CloudKMS.Builder(httpTransport, jsonFactory, httpCredentialsAdapter)
+    val kms = new CloudKMS.Builder(GoogleAuthMode.httpTransport, AuthMode.jsonFactory, httpCredentialsAdapter)
       .setApplicationName("cromwell")
       .build()
 

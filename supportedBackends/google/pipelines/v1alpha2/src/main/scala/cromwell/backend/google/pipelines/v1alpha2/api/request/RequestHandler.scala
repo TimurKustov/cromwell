@@ -9,7 +9,7 @@ import com.google.api.client.http.HttpRequest
 import com.google.api.services.genomics.Genomics
 import cromwell.backend.google.pipelines.common.api.PipelinesApiRequestHandler
 import cromwell.backend.google.pipelines.common.api.PipelinesApiRequestManager.{PAPIAbortRequest, PAPIApiRequest, PAPIRunCreationRequest, PAPIStatusPollRequest}
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
+import cromwell.cloudsupport.auth.{AuthMode, GoogleAuthMode}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
@@ -19,7 +19,7 @@ class RequestHandler(applicationName: String, endpointUrl: URL) extends Pipeline
   with GetRequestHandler 
   with AbortRequestHandler {
 
-  override def makeBatchRequest = new Genomics.Builder(GoogleAuthMode.httpTransport, GoogleAuthMode.jsonFactory, (_: HttpRequest) => ())
+  override def makeBatchRequest = new Genomics.Builder(GoogleAuthMode.httpTransport, AuthMode.jsonFactory, (_: HttpRequest) => ())
     .setApplicationName(applicationName)
     .setRootUrl(endpointUrl.toString)
     .build().batch()

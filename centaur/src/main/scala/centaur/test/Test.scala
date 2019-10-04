@@ -24,8 +24,8 @@ import common.validation.Validation._
 import configs.syntax._
 import cromwell.api.CromwellClient.UnsuccessfulRequestException
 import cromwell.api.model.{CallCacheDiff, Failed, SubmittedWorkflow, Succeeded, TerminalStatus, WorkflowId, WorkflowMetadata, WorkflowStatus}
+import cromwell.cloudsupport.auth.{AuthMode, GoogleAuthMode}
 import cromwell.cloudsupport.gcp.GoogleConfiguration
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import io.circe.parser._
 import spray.json.JsString
 
@@ -104,7 +104,7 @@ object Operations extends StrictLogging {
   lazy val genomics: Genomics = {
     val builder = new Genomics.Builder(
       GoogleAuthMode.httpTransport,
-      GoogleAuthMode.jsonFactory,
+      AuthMode.jsonFactory,
       new HttpCredentialsAdapter(credentials)
     )
     builder

@@ -13,8 +13,8 @@ import com.google.api.services.storage.StorageScopes
 import com.google.auth.Credentials
 import com.google.auth.http.HttpCredentialsAdapter
 import com.typesafe.config.Config
+import cromwell.cloudsupport.auth.{AuthMode, GoogleAuthMode}
 import cromwell.cloudsupport.gcp.GoogleConfiguration
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import cromwell.cloudsupport.gcp.gcs.GcsStorage
 import cromwell.services.healthmonitor.ProtoHealthMonitorServiceActor
 import cromwell.services.healthmonitor.ProtoHealthMonitorServiceActor.{MonitoredSubsystem, OkStatus, SubsystemStatus}
@@ -107,7 +107,7 @@ object WorkbenchHealthMonitorServiceActor {
                                papiProjectId: String)(implicit val ec: ExecutionContext) extends GenomicsChecker {
     val genomics = new com.google.api.services.genomics.Genomics.Builder(
       GoogleAuthMode.httpTransport,
-      GoogleAuthMode.jsonFactory,
+      AuthMode.jsonFactory,
       httpInitializer(credentials))
       .setApplicationName(applicationName)
       .setRootUrl(endpointUrl.toString)
@@ -126,7 +126,7 @@ object WorkbenchHealthMonitorServiceActor {
                                papiProjectId: String)(implicit val ec: ExecutionContext) extends GenomicsChecker {
     val genomics = new com.google.api.services.genomics.v2alpha1.Genomics.Builder(
       GoogleAuthMode.httpTransport,
-      GoogleAuthMode.jsonFactory,
+      AuthMode.jsonFactory,
       httpInitializer(credentials))
       .setApplicationName(applicationName)
       .setRootUrl(endpointUrl.toString)

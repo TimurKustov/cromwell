@@ -12,8 +12,8 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.Storage.BlobGetOption
 import com.google.cloud.storage.{Blob, StorageException, StorageOptions}
 import com.typesafe.config.Config
+import cromwell.cloudsupport.auth.GoogleAuthMode
 import cromwell.cloudsupport.gcp.GoogleConfiguration
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import cromwell.core.WorkflowOptions
 import cromwell.core.path.{PathBuilder, PathBuilderFactory}
 import org.apache.http.impl.client.HttpClientBuilder

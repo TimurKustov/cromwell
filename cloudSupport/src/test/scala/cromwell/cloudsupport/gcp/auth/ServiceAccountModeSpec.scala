@@ -3,6 +3,7 @@ package cromwell.cloudsupport.gcp.auth
 import java.io.FileNotFoundException
 
 import better.files.File
+import cromwell.cloudsupport.auth.{GoogleAuthMode, ServiceAccountMode} .ServiceAccountMode
 import org.scalatest.{FlatSpec, Matchers}
 
 class ServiceAccountModeSpec extends FlatSpec with Matchers {

@@ -14,7 +14,7 @@ import cromwell.backend.google.pipelines.v1alpha2.PipelinesConversions._
 import cromwell.backend.google.pipelines.v1alpha2.ToParameter.ops._
 import cromwell.backend.google.pipelines.v1alpha2.api.{NonPreemptiblePipelineInfoBuilder, PreemptiblePipelineInfoBuilder}
 import cromwell.backend.standard.StandardAsyncJob
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
+import cromwell.cloudsupport.auth.{AuthMode, GoogleAuthMode}
 import cromwell.core.logging.JobLogger
 
 import scala.collection.JavaConverters._
@@ -26,7 +26,7 @@ case class GenomicsFactory(applicationName: String, authMode: GoogleAuthMode, en
     new PipelinesApiRequestFactory {
       private val genomics = new Genomics.Builder(
         GoogleAuthMode.httpTransport,
-        GoogleAuthMode.jsonFactory,
+        AuthMode.jsonFactory,
         initializer)
         .setApplicationName(applicationName)
         .setRootUrl(endpointUrl.toString)

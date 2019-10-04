@@ -7,8 +7,8 @@ import cromwell.backend.google.pipelines.common.authentication.PipelinesApiDocke
 import cromwell.backend.google.pipelines.common.callcaching.{PipelinesApiBackendCacheHitCopyingActor, PipelinesApiBackendFileHashingActor}
 import cromwell.backend.standard._
 import cromwell.backend.standard.callcaching.{StandardCacheHitCopyingActor, StandardFileHashingActor}
+import cromwell.cloudsupport.auth.GoogleAuthMode
 import cromwell.cloudsupport.gcp.GoogleConfiguration
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import cromwell.core.{CallOutputs, DockerCredentials}
 import wom.graph.CommandCallNode
 

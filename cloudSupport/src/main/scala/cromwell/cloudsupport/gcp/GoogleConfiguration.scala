@@ -11,8 +11,8 @@ import com.typesafe.config.{Config, ConfigException}
 import common.exception.MessageAggregation
 import common.validation.ErrorOr._
 import common.validation.Validation._
-import cromwell.cloudsupport.gcp.auth.ServiceAccountMode.{JsonFileFormat, PemFileFormat}
-import cromwell.cloudsupport.gcp.auth._
+import cromwell.cloudsupport.auth.ServiceAccountMode.{JsonFileFormat, PemFileFormat}
+import cromwell.cloudsupport.auth.{ApplicationDefaultMode, GoogleAuthMode, RefreshTokenMode, ServiceAccountMode, UserMode, UserServiceAccountMode}
 import net.ceedubs.ficus.Ficus._
 import org.slf4j.LoggerFactory
 

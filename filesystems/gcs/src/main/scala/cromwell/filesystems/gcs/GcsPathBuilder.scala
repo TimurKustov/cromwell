@@ -14,7 +14,7 @@ import com.google.cloud.storage.Storage.BlobTargetOption
 import com.google.cloud.storage.contrib.nio.{CloudStorageConfiguration, CloudStorageFileSystem, CloudStoragePath}
 import com.google.cloud.storage.{BlobId, BlobInfo, StorageOptions}
 import com.google.common.net.UrlEscapers
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
+import cromwell.cloudsupport.auth.GoogleAuthMode
 import cromwell.cloudsupport.gcp.gcs.GcsStorage
 import cromwell.core.WorkflowOptions
 import cromwell.core.path.{NioPath, Path, PathBuilder}

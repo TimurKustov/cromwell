@@ -14,7 +14,7 @@ import cromwell.backend.google.pipelines.v2alpha1.PipelinesConversions._
 import cromwell.backend.google.pipelines.v2alpha1.api.ActionBuilder.Labels.Key
 import cromwell.backend.google.pipelines.v2alpha1.api.Deserialization._
 import cromwell.backend.google.pipelines.v2alpha1.api.request.ErrorReporter._
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
+import cromwell.cloudsupport.auth.AuthMode
 import cromwell.core.ExecutionEvent
 import io.grpc.Status
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -33,7 +33,7 @@ trait GetRequestHandler { this: RequestHandler =>
       pollingRequest.requester ! interpretOperationStatus(operation, pollingRequest)
       TrySuccess(())
     case response =>
-      val failure = Try(GoogleJsonError.parse(GoogleAuthMode.jsonFactory, response)) match {
+      val failure = Try(GoogleJsonError.parse(AuthMode.jsonFactory, response)) match {
         case TrySuccess(googleError) => new SystemPAPIApiException(GoogleJsonException(googleError, response.getHeaders))
         case Failure(_) => new SystemPAPIApiException(new RuntimeException(s"Failed to get status for operation ${pollingRequest.jobId.jobId}: HTTP Status Code: ${response.getStatusCode}"))
       }

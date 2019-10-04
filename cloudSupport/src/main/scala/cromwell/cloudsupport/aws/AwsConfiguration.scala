@@ -39,7 +39,7 @@ import com.typesafe.config.{Config, ConfigException}
 import common.exception.MessageAggregation
 import common.validation.ErrorOr._
 import common.validation.Validation._
-import cromwell.cloudsupport.aws.auth.{AssumeRoleMode, AwsAuthMode, CustomKeyMode, DefaultMode}
+import cromwell.cloudsupport.auth.{AssumeRoleMode, AwsAuthMode, CustomKeyMode, DefaultMode}
 import net.ceedubs.ficus.Ficus._
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.regions.Region

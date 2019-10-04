@@ -34,8 +34,8 @@ import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import common.validation.ErrorOr.ErrorOr
 import common.validation.Validation._
+import cromwell.cloudsupport.auth.AwsAuthMode
 import cromwell.cloudsupport.aws.AwsConfiguration
-import cromwell.cloudsupport.aws.auth.AwsAuthMode
 import cromwell.cloudsupport.aws.s3.S3Storage
 import cromwell.core.path.PathBuilderFactory
 import cromwell.core.WorkflowOptions

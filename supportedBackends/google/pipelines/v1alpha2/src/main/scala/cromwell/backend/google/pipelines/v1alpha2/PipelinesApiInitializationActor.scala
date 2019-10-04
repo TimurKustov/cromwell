@@ -6,7 +6,7 @@ import com.google.cloud.storage.contrib.nio.CloudStorageOptions
 import cromwell.backend.google.pipelines.common.authentication.{GcsLocalizing, PipelinesApiAuthObject, PipelinesApiDockerCredentials}
 import cromwell.backend.google.pipelines.common.{PipelinesApiInitializationActorParams, PipelinesApiJobPaths, PipelinesApiWorkflowPaths}
 import cromwell.backend.google.pipelines.v1alpha2.PipelinesApiInitializationActor.AuthFileAlreadyExistsException
-import cromwell.cloudsupport.gcp.auth.{ClientSecrets, GoogleAuthMode}
+import cromwell.cloudsupport.auth.{ClientSecrets, GoogleAuthMode}
 import cromwell.core.path.Path
 import spray.json.{JsObject, JsTrue}
 

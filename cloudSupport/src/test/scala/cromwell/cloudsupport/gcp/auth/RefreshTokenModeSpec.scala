@@ -1,5 +1,7 @@
 package cromwell.cloudsupport.gcp.auth
 
+import cromwell.cloudsupport.auth.AuthMode.OptionLookupException
+import cromwell.cloudsupport.auth.{GoogleAuthMode, RefreshTokenMode}
 import org.scalatest.{FlatSpec, Matchers}
 
 class RefreshTokenModeSpec extends FlatSpec with Matchers {

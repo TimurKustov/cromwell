@@ -37,12 +37,12 @@ import cats.data.Validated._
 import cats.syntax.either._
 import cats.syntax.apply._
 import com.typesafe.config.{Config, ConfigValue}
-import cromwell.cloudsupport.aws.auth.AwsAuthMode
 import cromwell.backend.impl.aws.callcaching.{AwsBatchCacheHitDuplicationStrategy, CopyCachedOutputs, UseOriginalCachedOutputs}
 import cromwell.cloudsupport.aws.AwsConfiguration
 import common.exception.MessageAggregation
 import common.validation.ErrorOr._
 import common.validation.Validation._
+import cromwell.cloudsupport.auth.AwsAuthMode
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api._
 import eu.timepit.refined._

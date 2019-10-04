@@ -6,7 +6,8 @@ import java.util.Base64
 
 import com.google.api.client.http.{HttpHeaders, HttpResponseException}
 import com.google.auth.oauth2.GoogleCredentials
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode.OptionLookup
+import cromwell.cloudsupport.auth.AuthMode.OptionLookup
+import cromwell.cloudsupport.auth.{AuthMode, GoogleAuthMode, SimpleClientSecrets}
 import org.scalatest.Assertions._
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
@@ -59,7 +60,7 @@ object GoogleAuthModeSpec {
 
   private def toJson(contents: (String, String)*): String = {
     // Generator doesn't matter as long as it generates JSON. Using `jsonFactory` to get an extra line hit of coverage.
-    val factory = GoogleAuthMode.jsonFactory
+    val factory = AuthMode.jsonFactory
     val writer = new StringWriter()
     val generator = factory.createJsonGenerator(writer)
     generator.enablePrettyPrint()

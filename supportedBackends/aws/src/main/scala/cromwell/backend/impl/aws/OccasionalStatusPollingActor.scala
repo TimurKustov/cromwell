@@ -3,7 +3,7 @@ package cromwell.backend.impl.aws
 import akka.actor.{Actor, ActorLogging, Props}
 import cromwell.backend.impl.aws.OccasionalStatusPollingActor._
 import cromwell.backend.impl.aws.RunStatus.{Initializing, Running}
-import cromwell.cloudsupport.aws.auth.AwsAuthMode
+import cromwell.cloudsupport.auth.AwsAuthMode
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.batch.BatchClient
@@ -36,7 +36,7 @@ class OccasionalStatusPollingActor(configRegion: Option[Region], optAwsAuthMode:
   lazy val client = {
     val builder = BatchClient.builder()
     optAwsAuthMode.foreach { awsAuthMode =>
-      builder.credentialsProvider(StaticCredentialsProvider.create(awsAuthMode.credential(_ => "")))
+      builder.credentialsProvider(StaticCredentialsProvider.create(awsAuthMode.credentials(_ => "")))
     }
     configRegion.foreach(builder.region)
     builder.build

@@ -7,9 +7,9 @@ import cats.data.Validated.{Invalid, Valid}
 import cats.instances.future._
 import cats.syntax.functor._
 import com.typesafe.config.Config
+import cromwell.cloudsupport.auth.ServiceAccountMode
+import cromwell.cloudsupport.auth.ServiceAccountMode.JsonFileFormat
 import cromwell.cloudsupport.gcp.GoogleConfiguration
-import cromwell.cloudsupport.gcp.auth.ServiceAccountMode
-import cromwell.cloudsupport.gcp.auth.ServiceAccountMode.JsonFileFormat
 import cromwell.core.Dispatcher._
 import cromwell.services.metadata.MetadataService.{MetadataWriteFailure, MetadataWriteSuccess, PutMetadataAction, PutMetadataActionAndRespond}
 import cromwell.services.metadata._

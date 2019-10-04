@@ -5,8 +5,8 @@ import com.google.api.gax.retrying.RetrySettings
 import com.typesafe.config.Config
 import common.validation.ErrorOr.ErrorOr
 import common.validation.Validation._
+import cromwell.cloudsupport.auth.GoogleAuthMode
 import cromwell.cloudsupport.gcp.GoogleConfiguration
-import cromwell.cloudsupport.gcp.auth.GoogleAuthMode
 import cromwell.cloudsupport.gcp.gcs.GcsStorage
 import cromwell.core.WorkflowOptions
 import cromwell.core.path.PathBuilderFactory

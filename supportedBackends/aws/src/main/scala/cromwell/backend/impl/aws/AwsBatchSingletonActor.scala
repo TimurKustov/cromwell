@@ -3,7 +3,7 @@ package cromwell.backend.impl.aws
 import akka.actor.{Actor, ActorLogging, Props}
 import cromwell.backend.impl.aws.IntervalLimitedAwsJobSubmitActor.IntervalLimitedAwsJobSubmitActorMessage
 import cromwell.backend.impl.aws.OccasionalStatusPollingActor.OccasionalStatusPollingActorMessage
-import cromwell.cloudsupport.aws.auth.AwsAuthMode
+import cromwell.cloudsupport.auth.AwsAuthMode
 import cromwell.core.Mailbox
 import software.amazon.awssdk.regions.Region
 
